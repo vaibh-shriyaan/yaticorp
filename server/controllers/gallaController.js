@@ -1,8 +1,7 @@
 const mongoose=require('mongoose');
 
 exports.saveUserChats=async(req,res)=>{
-    const Phone=req.body.Phone
-    const CardNumber=req.body.CardNumber
+    
     const gallaData={
         ...req.body,
         Phone:Number(req.body.Phone),
@@ -10,7 +9,7 @@ exports.saveUserChats=async(req,res)=>{
     }
 try{
     await mongoose.connection.db.collection('Form_data')
-    .insertOne(gallaData,{Phone:Number(Phone)},{CardNumber:Number(CardNumber)})
+    .insertOne(gallaData)
     res.status(200).json({
         success:true,
         message:"Data saved successfully",
