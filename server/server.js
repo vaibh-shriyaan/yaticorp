@@ -1,4 +1,7 @@
-// server.js
+// Vaibhav K
+// This is the main server file to start the server(Contains all the Routes to be handled by the server.)
+//All API routes are v1(version 1).
+
 const express = require('express');
 const mongoose=require('mongoose');
 const cors = require('cors');
@@ -12,7 +15,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-//connect DB
+//connect to mongoDB(configs/db.js)
 ConnectDB();
 
 // Register user (similar to sheetBest POST)
@@ -26,9 +29,14 @@ ConnectDB();
 //   }
 // });
 
+//All the routes (specific to this server).
 
-app.use('/api/v1/auth',authRoute); 
-app.use('/api/v1/users',chatRoute);
+app.use('/api/v1/auth',authRoute); //Fetches user details & forwards the  same to Learnyst/signup
+
+app.use('/api/v1/users',chatRoute); //POSt route to collect user details from GallaBox.
+
+
+
 
 app.listen(process.env.PORT,'0.0.0.0', () => {
   console.log(`Server running on port ${process.env.PORT} in ${process.env.MODE}`);
