@@ -58,12 +58,12 @@ exports.getCardDetails=async(req,res)=>{
     try{
     const card=await  card_details.findOne({CardNumber:req.body.CardNumber})
     if(!card){
-        res.status(404).json({
+        return res.status(404).json({
             success:false,
             message:"Card Number not found."
         })
     }
-        res.status(200).json({
+        return res.status(200).json({
             success:true,
             message:"Card details fetched sucessfully!",
             details:card
@@ -71,7 +71,7 @@ exports.getCardDetails=async(req,res)=>{
     
     }catch(err){
         return res.status(500).json({
-            success:true,
+            success:false,
             message:err.data?.message||"Error fetching details",
             error:err.message
         })
@@ -96,7 +96,7 @@ exports.getRepDetails=async(req,res)=>{
     
     }catch(err){
         return res.status(500).json({
-            success:true,
+            success:false,
             message:err.data?.message||"Error fetching details",
             error:err.message
         })
