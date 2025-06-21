@@ -56,7 +56,7 @@ try{
 
 exports.getCardDetails=async(req,res)=>{
     try{
-    const card=await  card_details.findOne({CardNumber:req.body.SerialNumber})
+    const card=await  card_details.findOne({SerialNumber:req.body.SerialNumber})
     if(!card){
         return res.status(404).json({
             success:false,
