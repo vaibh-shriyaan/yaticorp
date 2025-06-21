@@ -56,7 +56,7 @@ try{
 
 exports.getCardDetails=async(req,res)=>{
     try{
-    const card=await  card_details.findOne({CardNumber:req.body.CardNumber})
+    const card=await  card_details.findOne({CardNumber:req.body.SerialNumber})
     if(!card){
         return res.status(404).json({
             success:false,
@@ -83,12 +83,12 @@ exports.getRepDetails=async(req,res)=>{
     try{
     const user=await  sales_rep.findOne({AIRR_Phone:req.body.phone})
     if(!user){
-        res.status(404).json({
+       return res.status(404).json({
             success:false,
             message:"Employee not found."
         })
     }
-        res.status(200).json({
+        return res.status(200).json({
             success:true,
             message:"Employee Data fetched sucessfully!",
             Emp:user
@@ -117,12 +117,12 @@ exports.addEmpToUser=async(req,res)=>{
     const user=await new emp_ToUser(data)
     await user.save();
     if(!user){
-        res.status(404).json({
+       return res.status(404).json({
             success:false,
             message:"Records not updated"
         })
     }
-        res.status(200).json({
+       return res.status(200).json({
             success:true,
             message:"Data synced successfully!",
             Emp:user
@@ -130,7 +130,7 @@ exports.addEmpToUser=async(req,res)=>{
     
     }catch(err){
         return res.status(500).json({
-            success:true,
+            success:false,
             message:err.data?.message||"Error fetching details",
             error:err.message
         })
@@ -153,12 +153,12 @@ exports.updateEmp=async(req,res)=>{
         {new:true,upsert:false}
     )
     if(!user){
-        res.status(404).json({
+        return res.status(404).json({
             success:false,
             message:"Records not updated"
         })
     }
-        res.status(200).json({
+        return res.status(200).json({
             success:true,
             message:"Data synced successfully!",
             Emp:user
@@ -166,7 +166,7 @@ exports.updateEmp=async(req,res)=>{
     
     }catch(err){
         return res.status(500).json({
-            success:true,
+            success:false,
             message:err.data?.message||"Error fetching details",
             error:err.message
         })
