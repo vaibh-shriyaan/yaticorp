@@ -11,23 +11,24 @@ const emp_Schema = mongoose.Schema(
     },
     SerialNumber: {
       type: Number,
+      unique:true,
     },
     AIRR_ID: {
       type: Number,
-      unique: true,
     },
     AIRR_Name: {
       type: String,
     },
     AIRR_Phone: {
       type: Number,
-      unique: true,
     },
     payment_status: {
       type: String,
+      default:null
     },
     CVV: {
       type: Number,
+      unique:true,
     },
     CardNumber: {
       type: Number,

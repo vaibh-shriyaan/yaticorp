@@ -36,7 +36,7 @@ exports.getUserById = async (req, res) => {
         learnystData
       );
     } catch (LearnErr) {
-      return res.status(502).json({
+      return res.status(502).json({                                             //502 code is returned by proxy server ,here learnyst
         success: false,
         message: "User sync with learnyst failed",
         error: LearnErr.response?.data || LearnErr.message,
@@ -65,9 +65,9 @@ exports.addSalesRep = async (req, res) => {
   try {
     const user = await new sales_rep(req.body);
     await user.save();
-    return res.status(200).json({
+    return res.status(201).json({
       succcess: true,
-      message: "Data saved successfully",
+      message: "Employee created successfully",
     });
   } catch (error) {
     return res.status(500).json({
@@ -100,7 +100,7 @@ exports.resetPass = async (req, res) => {
         { upsert: false }
       );
 
-      return res.status(200).json({
+      return res.status(204).json({
         success: true,
         message: "Password Updated successfully!",
       });

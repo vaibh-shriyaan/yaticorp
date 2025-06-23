@@ -17,7 +17,7 @@ try{
     const newUser=new User_data(gallaData);
     await newUser.save();
  
-    const users=await  User_data.find({AIRR_ID:gallaData.AIRR_ID})
+  
     
     //let updated_sales;
     // if(newUser){
@@ -28,14 +28,7 @@ try{
     //     )                                             //populate('users'); use this to fetch users under him/her
     
     // }
-    const total_sales=users.length;                   //here we update the total sales based on users under him/her. 
-
-    await sales_rep.findOneAndUpdate(
-        {AIRR_ID:gallaData.AIRR_ID},
-        {$set:{'Total_sales':total_sales}},
-        {new:true,upsert:false}
-
-    )
+   
 
     res.status(200).json({
         success:true,
@@ -116,22 +109,30 @@ exports.addEmpToUser=async(req,res)=>{
     try{
     const user=await new emp_ToUser(data)
     await user.save();
+    const users=await  emp_ToUser.find({AIRR_ID:data.AIRR_ID})
     if(!user){
-       return res.status(404).json({
+       return res.status(400).json({
             success:false,
             message:"Records not updated"
         })
     }
-       return res.status(200).json({
+    const total_sales=users.length;                   //here we update the total sales based on users under him/her. 
+
+    await sales_rep.findOneAndUpdate(
+        {AIRR_ID:data.AIRR_ID},
+        {$set:{'Total_sales':total_sales}},
+        {new:true,upsert:false}
+
+    )
+       return res.status(204).json({
             success:true,
-            message:"Data synced successfully!",
-            Emp:user
+            message:"Employee Data added successfully!",
         })
     
     }catch(err){
         return res.status(500).json({
             success:false,
-            message:err.data?.message||"Error fetching details",
+            message:err.data?.message||"Internal server error",
             error:err.message
         })
     }
@@ -143,31 +144,34 @@ exports.updateEmp=async(req,res)=>{
         const data={
             ...req.body,
             SerialNumber:Number(req.body.SerialNumber),
-            CardNumber:Number(req.body.CardNumber),
-            CVV:Number(req.body.CVV)
+            
         }
     try{
+        if(req.body.CardNumber && req.body.CVV!==undefined){
+
+            data.CardNumber=Number(req.body.CardNumber),
+            data.CVV=Number(req.body.CVV)
+        }
    const user= await emp_ToUser.findOneAndUpdate(
         {SerialNumber:data.SerialNumber},
-        {$set:{'CardNumber':data.CardNumber,'CVV':data.CVV}},
+        {$set:{'CardNumber':data.CardNumber,'CVV':data.CVV,'payment_status':data.payment_status}},
         {new:true,upsert:false}
     )
     if(!user){
         return res.status(404).json({
             success:false,
-            message:"Records not updated"
+            message:"User not found"
         })
     }
-        return res.status(200).json({
+        return res.status(204).json({
             success:true,
             message:"Data synced successfully!",
-            Emp:user
         })
     
     }catch(err){
         return res.status(500).json({
             success:false,
-            message:err.data?.message||"Error fetching details",
+            message:err.data?.message||"Error updating details",
             error:err.message
         })
     }

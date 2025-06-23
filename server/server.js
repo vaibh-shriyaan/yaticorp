@@ -9,31 +9,26 @@ require('dotenv').config();
 const authRoute=require('./routes/authRoute')
 const chatRoute=require('./routes/chatRoute')
 const ConnectDB=require('./config/db');
+const apiAuth=require('./middlewares/apiAuth')
 
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.disable('x-powered-by')
 
 //connect to mongoDB(configs/db.js)
 ConnectDB();
 
-// Register user (similar to sheetBest POST)
-// app.post('/api/register', async (req, res) => {
-//   try {
-//     const newUser = new User(req.body);
-//     await newUser.save();
-//     res.json({ message: 'User registered successfully' });
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
+//Middlewares
+app.use(apiAuth) //verfies headers
+
 
 //All the routes (specific to this server).
 
-app.use('/api/v1/auth',authRoute); //Fetches user details & forwards the  same to Learnyst/signup
+app.use('/api/v1/auth',authRoute); //For yaticorp.com
 
-app.use('/api/v1/users',chatRoute); //POSt route to collect user details from GallaBox.
+app.use('/api/v1/users',chatRoute); //For GallaBox
 
 
 
