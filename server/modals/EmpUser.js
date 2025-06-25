@@ -27,12 +27,13 @@ const emp_Schema = mongoose.Schema(
       default:null
     },
     CVV: {
-      type: Number,
-      unique:true,
+      type: Number,      
+      
+      default:null
     },
     CardNumber: {
       type: Number,
-      unique: true,
+      default:null
     },
   },
   { timestamp: true }
