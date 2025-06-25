@@ -144,7 +144,7 @@ exports.updateEmp = async (req, res) => {
     }
 
     //To update CardNumber & CVV
-    if (req.body.SerialNumber && req.body.AIRR_ID !== undefined) {
+    if (req.body.CardNumber && req.body.CVV !== undefined) {
       (CardNumber = Number(req.body.CardNumber)), (CVV = Number(req.body.CVV));
 
       await emp_ToUser.findOneAndUpdate(
@@ -161,6 +161,7 @@ exports.updateEmp = async (req, res) => {
 
     //If payment is updated,sales is updated
     if (req.body.payment_status === "paid") {
+      (AIRR_ID = Number(req.body.AIRR_ID));
       await emp_ToUser.findOneAndUpdate(
         { SerialNumber: req.body.SerialNumber },
         {
@@ -171,10 +172,10 @@ exports.updateEmp = async (req, res) => {
         { new: true, upsert: false }
       );
 
-      const users = await emp_ToUser.find({ AIRR_ID: req.body.AIRR_ID });
+      const users = await emp_ToUser.find({ AIRR_ID:AIRR_ID });
       const total_sales = users.length;
       await sales_rep.findOneAndUpdate(
-        { AIRR_ID: req.body.AIRR_ID },
+        { AIRR_ID:AIRR_ID },
         { $set: { Total_sales: total_sales } },
         { new: true, upsert: false }
       );
