@@ -11,8 +11,8 @@ const User_data = require("../modals/CustModal");
 exports.getUserById = async (req, res) => {
   try {
     const user = await User_data.findOne({
-      CardNumber: Number(req.params.CardNumber),
-    });
+      CardNumber:Number(req.body.CardNumber)
+  });
 
     //if user is not found
     if (!user)
