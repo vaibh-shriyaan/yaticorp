@@ -14,11 +14,25 @@ exports.getUserById = async (req, res) => {
       CardNumber: Number(req.params.CardNumber),
     });
 
+    //if user is not found
     if (!user)
       return res.status(404).json({
         success: false,
         error: "Card Number not found",
+        
       });
+
+    //if Password or CVV mismatch
+    if (
+      user.Verification_value !== req.body.password ||
+      user.CVV !== Number(req.body.CVV)
+    ) {
+      return res.status(401).json({
+        Error: true,
+        message: "Invalid credentials.",
+      });
+    }
+
     // const cardNumber=data.map(d=>d.CardNumber);
 
     const learnystData = {
@@ -36,9 +50,10 @@ exports.getUserById = async (req, res) => {
         learnystData
       );
     } catch (LearnErr) {
-      return res.status(502).json({                                             //502 code is returned by proxy server ,here learnyst
+      return res.status(502).json({
+        //502 code is returned by proxy server ,here learnyst
         success: false,
-        message: "User sync with learnyst failed",
+        message: "User already registered,Please login.",
         error: LearnErr.response?.data || LearnErr.message,
       });
     }
@@ -50,7 +65,7 @@ exports.getUserById = async (req, res) => {
       success: true,
       message: "Users synced to Learnyst",
       learnystResposne: LearnRes.data,
-      userData: user,
+      userData: {CardNumber:user.CardNumber,access:user.Access_type,course_id:user.Course_id},
     });
   } catch (err) {
     res.status(500).json({
@@ -88,27 +103,60 @@ exports.resetPass = async (req, res) => {
         message: "CardNumber not found",
       });
     }
-   
-      await User_data.findOneAndUpdate(
-        { CardNumber: req.body.CardNumber },
-        { $set: { Verification_value: req.body.NewPass } },
-        { upsert: false }
-      );
-      await Learnyst_data.findOneAndUpdate(
-        { email: `${req.body.CardNumber}@yaticorp.com`},
-        { $set: { password: req.body.NewPass } },
-        { upsert: false }
-      );
 
-      return res.status(204).json({
-        success: true,
-        message: "Password Updated successfully!",
-      });
-   
+    await User_data.findOneAndUpdate(
+      { CardNumber: req.body.CardNumber },
+      { $set: { Verification_value: req.body.NewPass } },
+      { upsert: false }
+    );
+    await Learnyst_data.findOneAndUpdate(
+      { email: `${req.body.CardNumber}@yaticorp.com` },
+      { $set: { password: req.body.NewPass } },
+      { upsert: false }
+    );
+
+    return res.status(204).json({
+      success: true,
+      message: "Password Updated successfully!",
+    });
   } catch (err) {
     return res.status(500).json({
       success: false,
       message: err.data?.message || "Internal Server error!",
+    });
+  }
+};
+
+
+//login controller
+exports.loginController = async (req, res) => {
+  try {
+    const user = await User_data.findOne({
+      CardNumber: Number(req.body.CardNumber),
+    });
+
+    //if user is not found
+    if (!user)
+      return res.status(404).json({
+        error: true,
+        error: "Card Number not found",
+      });
+
+    if (user.Verification_value !== req.body.password) {
+      return res.status(401).json({
+        error: true,
+        message: "Invalid credentials",
+      });
+    }
+
+    return res.status(200).json({
+      error: false,
+      message: "Login successfull!",
+    });
+  } catch (err) {
+    return res.status(500).json({
+      error: true,
+      message: err.data?.message||"Internal server error",
     });
   }
 };
