@@ -147,7 +147,7 @@ exports.updateEmp = async (req, res) => {
     if (req.body.CardNumber && req.body.CVV !== undefined) {
       (CardNumber = Number(req.body.CardNumber)), (CVV = Number(req.body.CVV));
 
-      await emp_ToUser.findOneAndUpdate(
+      const user = await emp_ToUser.findOneAndUpdate(
         { SerialNumber: req.body.SerialNumber },
         {
           $set: {
@@ -157,12 +157,21 @@ exports.updateEmp = async (req, res) => {
         },
         { new: true, upsert: false }
       );
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "Records not found!",
+        });
+      }
+      return res.status(200).json({
+        success: true,
+        message: "Card details updated!.",
+      });
     }
 
     //If payment is updated,sales is updated
     if (req.body.payment_status === "paid") {
-      (AIRR_ID = Number(req.body.AIRR_ID));
-      await emp_ToUser.findOneAndUpdate(
+      const update = await emp_ToUser.findOneAndUpdate(
         { SerialNumber: req.body.SerialNumber },
         {
           $set: {
@@ -171,18 +180,28 @@ exports.updateEmp = async (req, res) => {
         },
         { new: true, upsert: false }
       );
-
-      const users = await emp_ToUser.find({ AIRR_ID:AIRR_ID });
-      const total_sales = users.length;
-      await sales_rep.findOneAndUpdate(
-        { AIRR_ID:AIRR_ID },
-        { $set: { Total_sales: total_sales } },
-        { new: true, upsert: false }
-      );
+      if (update) {
+        const users = await emp_ToUser.find({ AIRR_ID: update.AIRR_ID });
+        const total_sales = users.length;
+        await sales_rep.findOneAndUpdate(
+          { AIRR_ID: update.AIRR_ID },
+          { $set: { Total_sales: total_sales } },
+          { new: true, upsert: false }
+        );
+        return res.status(404).json({
+          success: true,
+          message: "Records updated.",
+        });
+      }
 
       return res.status(200).json({
-        success: true,
-        message: "Payment status updated!",
+        success: false,
+        message: "Records not found!",
+      });
+    } else {
+      return res.status(401).json({
+        success: false,
+        message: "Field not allowed",
       });
     }
   } catch (err) {
