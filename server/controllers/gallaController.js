@@ -188,13 +188,13 @@ exports.updateEmp = async (req, res) => {
           { $set: { Total_sales: total_sales } },
           { new: true, upsert: false }
         );
-        return res.status(404).json({
+        return res.status(200).json({
           success: true,
           message: "Records updated.",
         });
       }
 
-      return res.status(200).json({
+      return res.status(404).json({
         success: false,
         message: "Records not found!",
       });
