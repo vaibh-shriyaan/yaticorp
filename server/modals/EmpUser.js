@@ -8,6 +8,7 @@ const emp_Schema = mongoose.Schema(
     },
     user_phone: {
       type: Number,
+      unique:true,
     },
     SerialNumber: {
       type: Number,
@@ -27,8 +28,7 @@ const emp_Schema = mongoose.Schema(
       default:null
     },
     CVV: {
-      type: Number,      
-      
+      type: String,     
       default:null
     },
     CardNumber: {

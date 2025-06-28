@@ -145,14 +145,14 @@ exports.updateEmp = async (req, res) => {
 
     //To update CardNumber & CVV
     if (req.body.CardNumber && req.body.CVV !== undefined) {
-      (CardNumber = Number(req.body.CardNumber)), (CVV = Number(req.body.CVV));
+      (CardNumber = Number(req.body.CardNumber));
 
       const user = await emp_ToUser.findOneAndUpdate(
-        { SerialNumber: req.body.SerialNumber },
+        { SerialNumber: Number(req.body.SerialNumber )},
         {
           $set: {
             CardNumber: CardNumber,
-            CVV: CVV,
+            CVV: req.body.CVV,
           },
         },
         { new: true, upsert: false }
