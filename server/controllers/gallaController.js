@@ -199,12 +199,13 @@ exports.updateEmp = async (req, res) => {
             },
           },
         ]);
-        await dealers.findOneAndUpdate(
+        const dealer=await dealers.findOneAndUpdate(
           {DD_ID:newDoc.DDID},
           {$set:{sold:result[0]?.sold}},
           {new:true,upsert:false}
         )
-
+        dealer.available=dealer.purchased-dealer.sold;
+        await dealer.save();
         return res.status(200).json({
           success: true,
           message: "Records updated.",

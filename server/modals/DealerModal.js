@@ -25,13 +25,13 @@ const dealer_Schema = mongoose.Schema({
 
 
 // Post-update hook: Recalculate "available = purchased - sold"
-dealer_Schema.post('findOneAndUpdate', async function (doc,next) {
-  if (doc) {
-    doc.available = doc.purchased - doc.sold;
-    await doc.save(); 
-    next();
-  }
-}); 
+// dealer_Schema.post('findOneAndUpdate', async function (doc,next) {
+//   if (doc) {
+//     doc.available = doc.purchased - doc.sold;
+//     await doc.save(); 
+//     next();
+//   }
+// }); 
 
 
 const dealers = mongoose.model("dealers", dealer_Schema);
