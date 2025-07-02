@@ -7,19 +7,20 @@ require("dotenv").config();
 const Learnyst_data = require("../modals/LearnystModal");
 const sales_rep = require("../modals/SalesRep");
 const User_data = require("../modals/CustModal");
+const dealerModal = require("../modals/DealerModal");
+const otp = require("../modals/otpModal");
 
 exports.getUserById = async (req, res) => {
   try {
     const user = await User_data.findOne({
-      CardNumber:Number(req.body.CardNumber)
-  });
+      CardNumber: Number(req.body.CardNumber),
+    });
 
     //if user is not found
     if (!user)
       return res.status(404).json({
         success: false,
         error: "Card Number not found",
-        
       });
 
     //if Password or CVV mismatch
@@ -65,7 +66,11 @@ exports.getUserById = async (req, res) => {
       success: true,
       message: "Users synced to Learnyst",
       learnystResposne: LearnRes.data,
-      userData: {CardNumber:user.CardNumber,access:user.Access_type,course_id:user.Course_id},
+      userData: {
+        CardNumber: user.CardNumber,
+        access: user.Access_type,
+        course_id: user.Course_id,
+      },
     });
   } catch (err) {
     res.status(500).json({
@@ -83,6 +88,23 @@ exports.addSalesRep = async (req, res) => {
     return res.status(201).json({
       succcess: true,
       message: "Employee created successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal server erorr",
+    });
+  }
+};
+
+//route to create Dealers
+exports.addDealer = async (req, res) => {
+  try {
+    const user = await new dealerModal(req.body);
+    await user.save();
+    return res.status(201).json({
+      succcess: true,
+      message: "Dealer created successfully",
     });
   } catch (error) {
     return res.status(500).json({
@@ -127,7 +149,6 @@ exports.resetPass = async (req, res) => {
   }
 };
 
-
 //login controller
 exports.loginController = async (req, res) => {
   try {
@@ -156,7 +177,41 @@ exports.loginController = async (req, res) => {
   } catch (err) {
     return res.status(500).json({
       error: true,
-      message: err.data?.message||"Internal server error",
+      message: err.data?.message || "Internal server error",
+    });
+  }
+};
+
+//To verify OTP controller
+exports.verifyController = async (req, res, next) => {
+  try {
+    const token = await otp.findOne({
+      CardNumber: Number(req.body.CardNumber),
+    });
+
+    //if OTP is not found
+    if (!token) {
+      return res.status(404).json({
+        error: true,
+        error: "OTP does not exist.",
+      });
+    }
+
+    if (token.OTP !== req.body.OTP) {
+      return res.status(401).json({
+        error: true,
+        message: "Invalid OTP",
+      });
+    }
+
+    return res.status(200).json({
+      error: false,
+      message: "OTP verified successfull!",
+    });
+  } catch (err) {
+    return res.status(500).json({
+      error: true,
+      message: err.data?.message || "Internal server error",
     });
   }
 };

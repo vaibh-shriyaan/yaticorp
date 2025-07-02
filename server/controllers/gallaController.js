@@ -5,6 +5,8 @@ const sales_rep = require("../modals/SalesRep");
 const User_data = require("../modals/CustModal");
 const card_details = require("../modals/verifyModal");
 const emp_ToUser = require("../modals/EmpUser");
+const dealers = require("../modals/DealerModal");
+const otp = require("../modals/otpModal");
 
 exports.saveUserChats = async (req, res) => {
   const gallaData = {
@@ -145,10 +147,10 @@ exports.updateEmp = async (req, res) => {
 
     //To update CardNumber & CVV
     if (req.body.CardNumber && req.body.CVV !== undefined) {
-      (CardNumber = Number(req.body.CardNumber));
+      CardNumber = Number(req.body.CardNumber);
 
       const user = await emp_ToUser.findOneAndUpdate(
-        { SerialNumber: Number(req.body.SerialNumber )},
+        { SerialNumber: Number(req.body.SerialNumber) },
         {
           $set: {
             CardNumber: CardNumber,
@@ -183,11 +185,26 @@ exports.updateEmp = async (req, res) => {
       if (update) {
         const users = await emp_ToUser.find({ AIRR_ID: update.AIRR_ID });
         const total_sales = users.length;
-        await sales_rep.findOneAndUpdate(
+       const newDoc= await sales_rep.findOneAndUpdate(
           { AIRR_ID: update.AIRR_ID },
           { $set: { Total_sales: total_sales } },
           { new: true, upsert: false }
         );
+        const result = await sales_rep.aggregate([
+          { $match: { DDID: newDoc.DDID } },
+          {
+            $group: {
+              _id: null,
+              sold: { $sum: '$Total_sales' },
+            },
+          },
+        ]);
+        await dealers.findOneAndUpdate(
+          {DD_ID:newDoc.DDID},
+          {$set:{sold:result[0]?.sold}},
+          {new:true,upsert:false}
+        )
+
         return res.status(200).json({
           success: true,
           message: "Records updated.",
@@ -212,3 +229,57 @@ exports.updateEmp = async (req, res) => {
     });
   }
 };
+
+
+//To fetch dealer details
+exports.getDealer = async (req, res) => {
+  try {
+    const user = await dealers.findOne({ DD_ID: req.body.DD_ID });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Dealer not found.",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Dealer Data fetched sucessfully!",
+      data: user,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: err.data?.message || "Error fetching details",
+      error: err.message,
+    });
+  }
+};
+
+//To store generated OTP
+exports.sendOtp = async (req, res) => {
+  const verify_token={
+    CardNumber:Number(req.body.CardNumber),
+    OTP:Number(req.body.OTP)
+  }
+  try {
+    const token = new otp(verify_token);
+    token.save();
+    if (!token) {
+      return res.status(404).json({
+        success: false,
+        message: "OTP not received!.",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "OTP saved!",
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: err.data?.message || "Internal server error.",
+      error: err.message,
+    });
+  }
+};
+

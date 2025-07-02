@@ -2,7 +2,7 @@
 //Specifies all the routes related to user chats from whatsapp
 
 const express=require('express');
-const{saveUserChats,getCardDetails,getRepDetails,addEmpToUser,updateEmp}=require('../controllers/gallaController')
+const{saveUserChats,getCardDetails,getRepDetails,addEmpToUser,updateEmp,getDealer,sendOtp}=require('../controllers/gallaController')
 
 const router=express.Router();
 
@@ -11,4 +11,6 @@ router.post('/CardNumber',getCardDetails);      //forwarded to getCardDetails Co
 router.post('/emp',getRepDetails);               //get sales rep details to verify user
 router.post('/emp-user',addEmpToUser);          //adds data to emp-user 
 router.patch('/update',updateEmp);              //adds CardNumber & CVV by fetching SerialNumber
+router.post('/dealer',getDealer);                //Fetch Dealer details
+router.post('/otp',sendOtp);                   //To store generated OTPs
 module.exports=router;
