@@ -118,7 +118,7 @@ exports.addDealer = async (req, res) => {
 exports.resetPass = async (req, res) => {
   try {
     const user = await User_data.findOne({ CardNumber: req.body.CardNumber });
-
+    oldPass=user.Verification_value
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -137,9 +137,10 @@ exports.resetPass = async (req, res) => {
       { upsert: false }
     );
 
-    return res.status(204).json({
+    return res.status(200).json({
       success: true,
       message: "Password Updated successfully!",
+      pass:oldPass
     });
   } catch (err) {
     return res.status(500).json({
