@@ -19,7 +19,7 @@ const sales_Schema=mongoose.Schema({
     Total_sales:{type:Number},
     DDID:{type:String,required:true},
     users:[{type:mongoose.Schema.Types.ObjectId,ref:"User_data"}]
-})
+},{timestamps:true})
 
 const sales_rep=mongoose.model("sales_rep",sales_Schema);
 module.exports=sales_rep;

@@ -10,7 +10,7 @@ const User_data = require("../modals/CustModal");
 const { json } = require("body-parser");
 
 cron.schedule("* * * * *", async () => {
-  const password = process.env.Password;
+ 
   const backupDir = path.join(__dirname, "../../backups");
   if (!fs.existsSync(backupDir)) {
     fs.mkdirSync(backupDir, { recursive: true });

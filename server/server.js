@@ -10,6 +10,7 @@ require('dotenv').config();
 //require('./utils/cron')
 const authRoute=require('./routes/authRoute')
 const chatRoute=require('./routes/chatRoute')
+const adminRoute=require('./routes/adminRoute')
 const ConnectDB=require('./config/db');
 const mongoSanitize=require('express-mongo-sanitize')
 const xss=require('xss-clean')
@@ -34,7 +35,7 @@ app.use(morgan('combined'));  //logs HTTP requests
 ConnectDB();
 
 //Middlewares
- app.use(apiAuth) //verfies headers
+app.use(apiAuth) //verfies headers
 
 
 //All the routes (specific to this server).
@@ -42,6 +43,8 @@ ConnectDB();
 app.use('/api/v1/auth',authRoute); //For yaticorp.com
 
 app.use('/api/v1/users',chatRoute); //For GallaBox
+
+app.use('/panel',adminRoute)                  //For Admin panel
 
 
 

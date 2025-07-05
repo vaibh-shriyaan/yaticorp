@@ -186,7 +186,7 @@ exports.loginController = async (req, res) => {
 exports.verifyController = async (req, res, next) => {
   try {
     const token = await otp.findOne({
-      CardNumber: Number(req.body.CardNumber),
+      OTP: Number(req.body.OTP),
     });
 
     //if OTP is not found
@@ -197,7 +197,7 @@ exports.verifyController = async (req, res, next) => {
       });
     }
 
-    if (token.OTP !== req.body.OTP) {
+    if (token.OTP !== Number(req.body.OTP)) {
       return res.status(401).json({
         error: true,
         message: "Invalid OTP",
